@@ -11,9 +11,9 @@ class GUI(Tk):
         self.configure(bg="black")
         self.geometry("500x900")
 
-        self.photo1 = PhotoImage(file = "giphy.gif")
-        self.PhotoLabel1 = Label(self, image=self.photo1, bg="black")
-        self.PhotoLabel1.grid(row = 0, column = 0, sticky = W)
+        #self.photo1 = PhotoImage(file = "giphy.gif")
+        #self.PhotoLabel1 = Label(self, image=self.photo1, bg="black")
+        #self.PhotoLabel1.grid(row = 0, column = 0, sticky = W)
 
         self.label2 = Label(self, text = "Enter the word you would like a definition for: ", fg="white", font="Times 18 bold", bg = "black")
         self.label2.grid(row = 1, column = 0, sticky = W)
@@ -93,25 +93,31 @@ class MakeQuiz(Toplevel):
         self.title("QUIZ")
         self.geometry("800x300")
         self.quiz = quiz
+        self.radiobutton = None
         self.radiobuttons = []
 
-    def is_correct(self):
-        if self.var.get() == 1: # a jó válasz value == 1
+    def select(self):
+        self.radiobutton = self.var.get()
+        self.check_answer()
+
+
+    def check_answer(self):
+        if self.radiobutton == 1: 
             self.quiz.good += 1
-        else: self.quiz.bad += 1
+        else: 
+            self.quiz.bad += 1
             
     def make_the_buttons(self):
         Label(self, text=self.quiz.random_word, fg="red").pack()
 
         self.var = IntVar()
-        self.var.set(self.quiz.good)
         i=2 #Azért, hogy a rossz megoldásokat ne együttesen pipálja be
         for answer in self.quiz.answers:
             i+=1
             if answer == self.quiz.the_good_answer:
-                button = Radiobutton(self, text=answer,variable=self.var, value=1)
+                button = Radiobutton(self, text=answer,variable=self.var, value=1, command = self.select)
             else: 
-                button = Radiobutton(self, text=answer,variable=self.var, value=i)
+                button = Radiobutton(self, text=answer,variable=self.var, value=i, command = self.select)
             button.pack()
             self.radiobuttons.append(button)
     
@@ -120,22 +126,20 @@ class MakeQuiz(Toplevel):
             widget.destroy()
 
         self.quiz.answers = []
-        self.radiobuttons = []
-        self.points_var = IntVar()
-        self.points_var.set(0)
+        self.radiobutton = None
         self.quiz.make_quiz()
 
         self.make_the_buttons()
         self.label = Label(self,text= "YOUR POINTS:").pack()
-        self.points = Label(self,textvariable=self.points_var).pack()
+        self.points = Label(self,text=self.quiz.good).pack()
 
         Button(self,text="NEXT", command=self.make_and_update).pack()
         Button(self, text= "EXIT THE QUIZ", command=self.exit).pack()
 
     def make_and_update(self):
         self.make_game()
-        if self.is_correct():
-            self.points_var.set(self.quiz.good)
+        self.check_answer()
+            
            
     def exit(self):
         self.destroy()
