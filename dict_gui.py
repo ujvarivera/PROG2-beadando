@@ -95,10 +95,14 @@ class MakeQuiz(Toplevel):
         self.quiz = quiz
         self.radiobutton = None
         self.radiobuttons = []
+        self.only_once = True #Azért, hogy ne kapjunk több pontot ha többször kattintunk a jó megoldásra,
+        #vagy ha a jó után a rosszat jelöljük meg 
 
     def select(self):
-        self.radiobutton = self.var.get()
-        self.check_answer()
+        if self.only_once:
+            self.radiobutton = self.var.get()
+            self.check_answer()
+        self.only_once = False
 
 
     def check_answer(self):
@@ -137,6 +141,7 @@ class MakeQuiz(Toplevel):
         Button(self, text= "EXIT THE QUIZ", command=self.exit).pack()
 
     def make_and_update(self):
+        self.only_once = True
         self.make_game()
         self.check_answer()
             
