@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.ttk import Radiobutton
 from tkinter import messagebox
-from dict_logic import Dictionary, Quiz
+from dict_logic import Dictionary, Quiz, Plot
 
 class GUI(Tk):
     """ A szótár megjelenítéséért felelős osztály."""
@@ -10,7 +10,7 @@ class GUI(Tk):
         self.dictionary = dictionary
         self.title("My dictionary")
         self.configure(bg="#33cccc")
-        self.geometry("520x800")
+        self.geometry("520x820")
 
         self.label2 = Label(self, text = "Enter the word you would like a definition for: ", font="Times 18 bold", bg="#33cccc")
         self.label2.grid(row = 1, column = 0, sticky = W)
@@ -45,10 +45,13 @@ class GUI(Tk):
         add_button = Button(self, text="ADD", command = self.add_new)
         add_button.grid(row = 12, column =0, sticky = W, padx = 10)
 
-        Button(self, text="LET'S TAKE A QUIZ!",command=self.play,fg="#1a1aff").grid(row=13, column=0, sticky = W, pady=10, padx = 10)
+        Button(self, text="LET'S TAKE A QUIZ!",command=self.play,fg="#1a1aff").grid(row=13, column=0, sticky = W, pady=5, padx = 10)
+
+        self.stat_button = Button(self, text="SHOW MY STAT",command=self.stat)
+        self.stat_button.grid(row=14, column=0, sticky = W, pady=5, padx = 10)
 
         self.exit_button = Button(self, text="EXIT", width = 10, command = self.exit)
-        self.exit_button.grid(row=14,column=0,sticky=W, padx = 10)
+        self.exit_button.grid(row=15,column=0,sticky=W, padx = 10, pady = 15)
 
     def search(self,*args):
         """Megkeresi a beírt szóhoz tartozó jelentést, és a SEARCH gomb megnyomása, vagy az enter billentyű lenyomása
@@ -87,14 +90,23 @@ class GUI(Tk):
 
     def play(self):
         """A LET'S PLAY gombhoz van hozzárendelve, felugró ablakban megjeleníti a QUIZ-t"""
-        quiz = MakeQuiz(self,Quiz(self.dictionary))
-        quiz.make_game()
+        self.quiz1 = Quiz(self.dictionary)
+        playQuiz = MakeQuiz(self,self.quiz1)
+        playQuiz.make_game()
 
+    def stat(self):
+        """Az aktuális statisztikát készíti el a matplotlib segítségével, a SHOW MY STAT gomb megnyomása után.
+        Ha nem játszottunk még a QUIZ-zel, akkor nem jelenik meg semmi. """
+        try:
+            plot1 = Plot(self.quiz1)
+            plot1.make_plot()
+        except:pass
 
 class MakeQuiz(Toplevel):
     """ A QUIZ megjelenítő osztálya, amely egy felugró ablakban jelenik meg. """
     def __init__(self, master, quiz=Quiz):
         super().__init__(master)
+        self.master = master
         self.title("QUIZ")
         self.geometry("800x250")
         self.quiz = quiz
@@ -119,9 +131,9 @@ class MakeQuiz(Toplevel):
     
     def make_game(self):
         "Kezdetben ez a függvény hozza létre a Quiz-t, majd a NEXT gombbal a make_and_update függvény hívódik meg."
+        self.master.withdraw() #eltűnteti a főablakot, amíg a QUIZ fut
         self.quiz.answers = []
         self.quiz.make_quiz()
-
         self.make_the_widgets()
         self.label = Label(self,text= "YOUR POINTS:").pack()
         self.points = Label(self,text=self.quiz.good).pack()
@@ -136,19 +148,15 @@ class MakeQuiz(Toplevel):
         self.quiz.questions += 1
         self.check_answer()
         self.make_game()
-    
-    def result(self):
-        """Megmutatja az eredményed az EXIT gomb megnyomása után, hogy hány százalékot értél el."""
-        try:
-            return int((self.quiz.good/self.quiz.questions)*100)
-        except ZeroDivisionError: pass
                  
     def exit(self):
         """Az EXIT gombhoz van hozzárendelve, ezzel léphetünk ki a QUIZ-ből. Előtte megmutatja egy messageboxban,
-        hány százalékot értél el."""
-        percentage = self.result()
+        hány százalékot értél el. Valamint újra megnyitja a főablakot."""
+        percentage = self.quiz.result()
         messagebox.showinfo(title="EREDMÉNY",message="Az eredményed: "+ str(percentage) +"%")
         self.destroy()
+        self.master.deiconify()
+
     
 if __name__=="__main__":
     dictionary = Dictionary("dictionary_of_words.json")
