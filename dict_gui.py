@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.ttk import Radiobutton
+from tkinter import messagebox
 from dict_logic import Dictionary, Quiz
 
 class GUI(Tk):
@@ -7,52 +8,47 @@ class GUI(Tk):
     def __init__(self, dictionary=Dictionary):
         super().__init__()
         self.dictionary = dictionary
-
         self.title("My dictionary")
-        self.configure(bg="black")
-        self.geometry("500x900")
+        self.configure(bg="#33cccc")
+        self.geometry("520x800")
 
-        #self.photo1 = PhotoImage(file = "giphy.gif")
-        #self.PhotoLabel1 = Label(self, image=self.photo1, bg="black")
-        #self.PhotoLabel1.grid(row = 0, column = 0, sticky = W)
-
-        self.label2 = Label(self, text = "Enter the word you would like a definition for: ", fg="white", font="Times 18 bold", bg = "black")
+        self.label2 = Label(self, text = "Enter the word you would like a definition for: ", font="Times 18 bold", bg="#33cccc")
         self.label2.grid(row = 1, column = 0, sticky = W)
 
         self.var = StringVar()
         self.var.set("Please enter a word")
-        self.text_entry = Entry(self, textvariable=self.var,width = 30, fg="white", font="Times 18 bold", bg = "black")
-        self.text_entry.grid(row = 2, column = 0, sticky = W)
+        self.text_entry = Entry(self, textvariable=self.var,width = 30, font="Times 18 bold")
+        self.text_entry.grid(row = 2, column = 0, sticky = W, pady=10, padx = 10)
         self.text_entry.bind("<Button-1>", self.reset)
 
-        self.button1 = Button(self, text= "SEARCH", fg= "white", bg ="black", width = 10, command = self.search)
-        self.button1.grid(row=3, column = 0, sticky = W)
+        self.random_button = Button(self, text="RANDOM",width = 10, command = self.get_random)
+        self.random_button.grid(row=3,column=0,sticky=W, padx = 10, pady=10)
+
+        self.button1 = Button(self, text= "SEARCH", width = 10, command = self.search)
+        self.button1.grid(row=4, column = 0, sticky = W, padx = 10)
         self.bind('<Return>', self.search)
 
-        self.label3 = Label(self, text ="\nDefinition: ", fg= "white", bg ="black", font="Times 18 bold")
-        self.label3.grid(row= 4, column=0, sticky = W)
+        self.label3 = Label(self, text ="\nDefinition: ", font="Times 18 bold", bg="#33cccc")
+        self.label3.grid(row= 5, column=0, sticky = W)
 
         self.output = Text(self, width=40, height=6, wrap=WORD, font="Times 18 bold")
-        self.output.grid(row=5, column=0, sticky = W)
+        self.output.grid(row=6, column=0, sticky = W, pady=20, padx = 10)
 
-        self.exit_button = Button(self, text="EXIT", bg="black", fg= "white",width = 10, command = self.exit)
-        self.exit_button.grid(row=6,column=0,sticky=W)
+        Label(self, text ="You can add new words here", bg="#33cccc", font="Times 15 bold").grid(row = 7, column =0, sticky = W, padx = 10, pady=10)
+        Label(self, text ="Word: ", bg="#33cccc", font="Times 15 bold").grid(row = 8, column =0, sticky = W, padx = 10)
+        self.text1 = Text(self, width = 30, height=1)
+        self.text1.grid(row = 9, column =0, sticky = W, padx = 10, pady=10)
+        Label(self, text ="Definition: ", bg="#33cccc", font="Times 15 bold").grid(row = 10, column =0, sticky = W, padx = 10)
+        self.text2 = Text(self, width = 30, height =6)
+        self.text2.grid(row = 11, column= 0, sticky = W, padx = 10, pady=10)
 
-        self.random_button = Button(self, text="RANDOM",bg="black", fg= "white",width = 10, command = self.get_random)
-        self.random_button.grid(row=7,column=0,sticky=W)
-    
-        Label(self, text ="You can add new words here").grid(row = 8, column =0)
-        Label(self, text ="Word: ").grid(row = 9, column =0)
-        self.text1 = Text(self, width = 15, height=1)
-        self.text1.grid(row = 10, column =0)
-        Label(self, text ="Definition: ").grid(row = 11, column =0)
-        self.text2 = Text(self, width = 15, height =6)
-        self.text2.grid(row = 12, column= 0)
         add_button = Button(self, text="ADD", command = self.add_new)
-        add_button.grid(row = 13, column =0)
+        add_button.grid(row = 12, column =0, sticky = W, padx = 10)
 
-        Button(self, text="LET'S PLAY",command=self.play).grid(row=14, column=0)
+        Button(self, text="LET'S TAKE A QUIZ!",command=self.play,fg="#1a1aff").grid(row=13, column=0, sticky = W, pady=10, padx = 10)
 
+        self.exit_button = Button(self, text="EXIT", width = 10, command = self.exit)
+        self.exit_button.grid(row=14,column=0,sticky=W, padx = 10)
 
     def search(self,*args):
         """Megkeresi a beírt szóhoz tartozó jelentést, és a SEARCH gomb megnyomása, vagy az enter billentyű lenyomása
@@ -100,10 +96,9 @@ class MakeQuiz(Toplevel):
     def __init__(self, master, quiz=Quiz):
         super().__init__(master)
         self.title("QUIZ")
-        self.geometry("800x300")
+        self.geometry("800x250")
         self.quiz = quiz
         
-
     def check_answer(self):
         """Megnézi, hogy a kijelölt Radiobutton a jó válasz-e, ha igen növeli a pontszámot 1-gyel."""
         if self.var.get() == 1: 
@@ -124,7 +119,6 @@ class MakeQuiz(Toplevel):
     
     def make_game(self):
         "Kezdetben ez a függvény hozza létre a Quiz-t, majd a NEXT gombbal a make_and_update függvény hívódik meg."
-        self.quiz.questions = 1
         self.quiz.answers = []
         self.quiz.make_quiz()
 
@@ -142,12 +136,20 @@ class MakeQuiz(Toplevel):
         self.quiz.questions += 1
         self.check_answer()
         self.make_game()
+    
+    def result(self):
+        """Megmutatja az eredményed az EXIT gomb megnyomása után, hogy hány százalékot értél el."""
+        try:
+            return int((self.quiz.good/self.quiz.questions)*100)
+        except ZeroDivisionError: pass
                  
     def exit(self):
-        "Az EXIT gombhoz van hozzárendelve, ezzel léphetünk ki a QUIZ-ből."
+        """Az EXIT gombhoz van hozzárendelve, ezzel léphetünk ki a QUIZ-ből. Előtte megmutatja egy messageboxban,
+        hány százalékot értél el."""
+        percentage = self.result()
+        messagebox.showinfo(title="EREDMÉNY",message="Az eredményed: "+ str(percentage) +"%")
         self.destroy()
-
-
+    
 if __name__=="__main__":
     dictionary = Dictionary("dictionary_of_words.json")
     view = GUI(dictionary)
