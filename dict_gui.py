@@ -3,6 +3,7 @@ from tkinter.ttk import Radiobutton
 from dict_logic import Dictionary, Quiz
 
 class GUI(Tk):
+    """ A szótár megjelenítéséért felelős osztály."""
     def __init__(self, dictionary=Dictionary):
         super().__init__()
         self.dictionary = dictionary
@@ -54,6 +55,8 @@ class GUI(Tk):
 
 
     def search(self,*args):
+        """Megkeresi a beírt szóhoz tartozó jelentést, és a SEARCH gomb megnyomása, vagy az enter billentyű lenyomása
+        után ki is írja azt. Ha nincs olyan szó, akkor kiírja, hogy Sorry."""
         entered_text = self.text_entry.get()
         self.output.delete(0.0, END)
         try:
@@ -64,17 +67,22 @@ class GUI(Tk):
         self.output.insert(END, definition)
 
     def exit(self):
+        """Ezzel zárhatjuk be a programot, az EXIT gombhoz van hozzárendelve"""
         self.destroy()
     
     def get_random(self):
+        """A szótár létező szavai közül kiválaszt random egyet, amelyet beilleszt az Entry-be."""
         self.text_entry.delete(0, 'end')
         Random = self.dictionary.get_random_word()
         self.text_entry.insert(0, Random)
 
     def reset(self,*args):
+        """A Entry tartalmát törli, a bal egérkattintáshoz van bind-olva."""
         self.text_entry.delete(0, END)
 
     def add_new(self):
+        """Kiolvassa a két szövegmezőbe beírt szót és definíciót, majd az ADD gomb megnyomása után
+        hozzáadja a már létező json fájlhoz, így ezután ez a kérdés is megjelenhet a QUIZ-ben."""
         get_text1 = self.text1.get("1.0","end-1c")
         get_text2 = self.text2.get("1.0","end-1c")
         self.dictionary.add_word(get_text1,get_text2)
@@ -82,58 +90,45 @@ class GUI(Tk):
         self.text2.delete('1.0', 'end')
 
     def play(self):
+        """A LET'S PLAY gombhoz van hozzárendelve, felugró ablakban megjeleníti a QUIZ-t"""
         quiz = MakeQuiz(self,Quiz(self.dictionary))
         quiz.make_game()
 
 
 class MakeQuiz(Toplevel):
+    """ A QUIZ megjelenítő osztálya, amely egy felugró ablakban jelenik meg. """
     def __init__(self, master, quiz=Quiz):
         super().__init__(master)
-
         self.title("QUIZ")
         self.geometry("800x300")
         self.quiz = quiz
-        self.radiobutton = None
-        self.radiobuttons = []
-        self.only_once = True #Azért, hogy ne kapjunk több pontot ha többször kattintunk a jó megoldásra,
-        #vagy ha a jó után a rosszat jelöljük meg 
-
-    def select(self):
-        if self.only_once:
-            self.radiobutton = self.var.get()
-            self.check_answer()
-        self.only_once = False
-
+        
 
     def check_answer(self):
-        if self.radiobutton == 1: 
+        """Megnézi, hogy a kijelölt Radiobutton a jó válasz-e, ha igen növeli a pontszámot 1-gyel."""
+        if self.var.get() == 1: 
             self.quiz.good += 1
-        else: 
-            self.quiz.bad += 1
-            
-    def make_the_buttons(self):
-        Label(self, text=self.quiz.random_word, fg="red").pack()
 
+    def make_the_widgets(self):
+        "Létrehozza a Labeleket és a Radiobuttonokat a QUIZ-hez."
+        Label(self, text=self.quiz.random_word, fg="red").pack()
         self.var = IntVar()
         i=2 #Azért, hogy a rossz megoldásokat ne együttesen pipálja be
         for answer in self.quiz.answers:
-            i+=1
             if answer == self.quiz.the_good_answer:
-                button = Radiobutton(self, text=answer,variable=self.var, value=1, command = self.select)
+                button = Radiobutton(self, text=answer,variable=self.var, value=1)
             else: 
-                button = Radiobutton(self, text=answer,variable=self.var, value=i, command = self.select)
+                i+=1
+                button = Radiobutton(self, text=answer,variable=self.var, value=i)
             button.pack()
-            self.radiobuttons.append(button)
     
     def make_game(self):
-        for widget in self.winfo_children():
-            widget.destroy()
-
+        "Kezdetben ez a függvény hozza létre a Quiz-t, majd a NEXT gombbal a make_and_update függvény hívódik meg."
+        self.quiz.questions = 1
         self.quiz.answers = []
-        self.radiobutton = None
         self.quiz.make_quiz()
 
-        self.make_the_buttons()
+        self.make_the_widgets()
         self.label = Label(self,text= "YOUR POINTS:").pack()
         self.points = Label(self,text=self.quiz.good).pack()
 
@@ -141,12 +136,15 @@ class MakeQuiz(Toplevel):
         Button(self, text= "EXIT THE QUIZ", command=self.exit).pack()
 
     def make_and_update(self):
-        self.only_once = True
-        self.make_game()
+        "Az előző widgeteket törli, lecsekkolja, hogy jó-e az előző válasz, majd új QUIZ kérdést és válaszlehetőségeket ad. "
+        for widget in self.winfo_children():
+            widget.destroy()
+        self.quiz.questions += 1
         self.check_answer()
-            
-           
+        self.make_game()
+                 
     def exit(self):
+        "Az EXIT gombhoz van hozzárendelve, ezzel léphetünk ki a QUIZ-ből."
         self.destroy()
 
 
