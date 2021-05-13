@@ -20,7 +20,12 @@ class Dictionary:
         return random.choice(list(self.data.values()))
 
     def add_word(self,word,definition):
-        """Hozzáadja a megadott szót és definíciót a json fájlhoz"""
+        """Hozzáadja a megadott szót és definíciót a json fájlhoz. 
+        Ha már létezik az a szó a szótárban, Exceptiont dob."""
+        for w in list(self.data.keys()):
+            if w == word:
+                raise Exception("A megadott szó már szerepel a szótárban!")
+                
         new_word = {word:definition}
         self.data.update(new_word)
         with open(self.filename, "w") as f:
