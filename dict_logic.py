@@ -1,6 +1,7 @@
 import os
 import json
 import random
+import matplotlib.pyplot as plt
 
 class Dictionary:
     """A szótár logikai osztálya."""
@@ -43,6 +44,12 @@ class Quiz:
         data_dict = dict(data_list)
         with open(self.dictionary.filename, "w") as f:
             f.write(json.dumps(data_dict))
+    
+    def result(self):
+        """Megmutatja az eredményed az EXIT gomb megnyomása után, hogy hány százalékot értél el."""
+        try:
+            return int((self.good/self.questions)*100)
+        except ZeroDivisionError: pass
 
     def make_quiz(self):
         """Megkeveri a JSON elemeit, kiválaszt egy random szót, és 4 válaszlehetőséget, melyek közül csak az egyik igaz.
@@ -58,6 +65,20 @@ class Quiz:
             if new not in self.answers:
                 self.answers.append(new)
         random.shuffle(self.answers)
+
+
+class Plot:
+    "A QUIZ-ben elért aktuális jó-rossz válaszok arányát mutatja meg."
+    def __init__(self, quiz = Quiz):
+        self.quiz = quiz
+
+    def make_plot(self):
+        plt.cla()
+        plt.title("Answers")
+        x = ["bad answers", "good answers", "number of questions"]
+        y = [(self.quiz.questions-self.quiz.good), self.quiz.good, self.quiz.questions]
+        plt.bar(x,y)
+        plt.show()
 
 
 
