@@ -17,11 +17,11 @@ Egy szó beírása után a ``` SEARCH ```gombbal kereshetünk rá annak jelenté
 Egy véletlenszerűen kiválasztott szóra is rákereshetünk a ``` RANDOM ``` segítségével. 
 Ha olyan szóra keresünk rá, ami nem található meg a szótárban, azt a program jelzi.
 A szótárban nem csak rákeresni lehet szavakra, hanem hozzáadni új szó-definíció párost is
-az ``` ADD ``` gomb lenyomásával.
+az ``` ADD ``` gomb lenyomásával. Ha a beírt szó már létezik a szótárban, Exceptiont kapunk.
 
 
 
-# GUIZ
+# QUIZ
 A QUIZ egy új ablakban jelenik meg, a szótár ``` LET'S TAKE A QUIZ ```  gomb megnyomása után. 
 
 A QUIZ véletlenszerűen kiválaszt egy szót a szótárból, majd 4 definíciót kínál, de csak egy helyes.
