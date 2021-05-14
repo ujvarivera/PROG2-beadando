@@ -13,6 +13,7 @@ A szótárat ilyen szerkezetű json fájlból lehet inicializálni:
     "apple": "a round fruit with shiny red or green skin that is fairly hard and white inside"
 }
 ```
+
 Egy szó beírása után a ``` SEARCH ```gombbal kereshetünk rá annak jelentésére.
 Egy véletlenszerűen kiválasztott szóra is rákereshetünk a ``` RANDOM ``` segítségével. 
 Ha olyan szóra keresünk rá, ami nem található meg a szótárban, azt a program jelzi.
@@ -30,6 +31,9 @@ Ha eltaláljuk a helyes megoldást, akkor kapunk 1 pontot, más esetben nem.
 A ``` NEXT ``` gomb lenyomása után újabb kérdés és válaszlehetőségeket kapunk, mindez addig megy,
 míg nem nyomunk rá az ``` EXIT THE QUIZ ```nyomra. Ezután egy messageboxban kapunk tájékoztatást,
 hogy a feltett kérdések-jó válaszok arányában hány százalékot értünk el.
+Feltett kérdések száma annyi, ahányszor rányomtunk a NEXT gombra, mielőtt kiléptünk az EXIT-tel.
+A ``` RESET ``` opcióval lenullázhatjuk az addig elért pontszámunkat, ha nem szép
+az eredményünk, illetve ekkor a kérdések számlálója is újra indul.
 
 
 # Plot
