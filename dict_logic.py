@@ -19,18 +19,25 @@ class Dictionary:
         """Visszaad egy random definíciót a már létező json fájlból."""
         return random.choice(list(self.data.values()))
 
-    def is_already_in_it(self,word):
+    def is_already_in_it(self,word:str):
         """Visszaadja, hogy a beírt szó szerepel-e már a szótárban"""
         for w in list(self.data.keys()):
             if w == word:
                 return True
         return False
 
-    def add_word(self,word,definition):
+    def is_empty(self, text:str):
+        """Visszaadja, hogy írtunk-e a mezőbe szöveget, vagy sem."""
+        return len(text) == 0
+
+    def add_word(self,word:str,definition:str):
         """Hozzáadja a megadott szót és definíciót a json fájlhoz. 
         Ha már létezik az a szó a szótárban, Exceptiont dob."""
         if self.is_already_in_it(word):
             raise Exception("A megadott szó már szerepel a szótárban!")
+
+        if self.is_empty(word) or self.is_empty(definition):
+            raise Exception("Egyik mező sem maradhat üres!")
 
         new_word = {word:definition}
         self.data.update(new_word)
@@ -79,16 +86,18 @@ class Quiz:
 
 
     def reset(self):
+        """Visszaállítja a pontszámot nullára, és a kérdések számlálója is újra indul."""
         self.questions = 0
         self.good = 0
 
 
 class Plot:
-    "A QUIZ-ben elért aktuális jó-rossz válaszok arányát mutatja meg."
+    """A QUIZ-ben elért aktuális jó-rossz válaszok arányát mutatja meg."""
     def __init__(self, quiz = Quiz):
         self.quiz = quiz
 
     def make_plot(self):
+        """Csinál egy plotot."""
         plt.cla()
         plt.title("Your answers")
         x = ["bad answers", "good answers", "number of questions"]
