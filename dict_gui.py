@@ -11,13 +11,16 @@ class GUI(Tk):
         self.title("My dictionary")
         self.configure(bg="#33cccc")
         self.geometry("520x820")
+        self.widgets()
 
-        self.label2 = Label(self, text = "Enter the word you would like a definition for: ", font="Times 18 bold", bg="#33cccc")
-        self.label2.grid(row = 1, column = 0, sticky = W)
+    def widgets(self):
+        """Létrehozza a szükséges widgeteket."""
+        self.label2 = Label(self, text = "DICTIONARY ", font="Times 18 bold", bg="#33cccc")
+        self.label2.grid(row = 1, column = 0, sticky = W, padx = 5)
 
         self.var = StringVar()
         self.var.set("Please enter a word")
-        self.text_entry = Entry(self, textvariable=self.var,width = 30, font="Times 18 bold")
+        self.text_entry = Entry(self, textvariable=self.var,width = 25, font="Times 15 bold")
         self.text_entry.grid(row = 2, column = 0, sticky = W, pady=10, padx = 10)
         self.text_entry.bind("<Button-1>", self.reset)
 
@@ -31,7 +34,7 @@ class GUI(Tk):
         self.label3 = Label(self, text ="\nDefinition: ", font="Times 18 bold", bg="#33cccc")
         self.label3.grid(row= 5, column=0, sticky = W)
 
-        self.output = Text(self, width=40, height=6, wrap=WORD, font="Times 18 bold")
+        self.output = Text(self, width=25, height=6, wrap=WORD, font="Times 15 bold")
         self.output.grid(row=6, column=0, sticky = W, pady=20, padx = 10)
 
         Label(self, text ="You can add new words here", bg="#33cccc", font="Times 15 bold").grid(row = 7, column =0, sticky = W, padx = 10, pady=10)
@@ -45,13 +48,13 @@ class GUI(Tk):
         add_button = Button(self, text="ADD", command = self.add_new)
         add_button.grid(row = 12, column =0, sticky = W, padx = 10)
 
-        Button(self, text="LET'S TAKE A QUIZ!",command=self.play,fg="#1a1aff").grid(row=13, column=0, sticky = W, pady=5, padx = 10)
+        Button(self, text="LET'S TAKE A QUIZ!",command=self.play,fg="#1a1aff").grid(row=3, column=1, sticky = W, pady=5, padx = 10)
 
         self.stat_button = Button(self, text="SHOW MY STAT",command=self.stat)
-        self.stat_button.grid(row=14, column=0, sticky = W, pady=5, padx = 10)
+        self.stat_button.grid(row=4, column=1, sticky = W, pady=5, padx = 10)
 
         self.exit_button = Button(self, text="EXIT", width = 10, command = self.exit)
-        self.exit_button.grid(row=15,column=0,sticky=W, padx = 10, pady = 15)
+        self.exit_button.grid(row=12,column=1,sticky=W, padx = 10, pady = 5)
 
     def search(self,*args):
         """Megkeresi a beírt szóhoz tartozó jelentést, és a SEARCH gomb megnyomása, vagy az enter billentyű lenyomása
@@ -93,6 +96,7 @@ class GUI(Tk):
         self.quiz1 = Quiz(self.dictionary)
         playQuiz = MakeQuiz(self,self.quiz1)
         playQuiz.make_game()
+        self.withdraw() #eltűnteti a főablakot, amíg a QUIZ fut
 
     def stat(self):
         """Az aktuális statisztikát készíti el a matplotlib segítségével, a SHOW MY STAT gomb megnyomása után.
@@ -101,6 +105,7 @@ class GUI(Tk):
             plot1 = Plot(self.quiz1)
             plot1.make_plot()
         except:pass
+
 
 class MakeQuiz(Toplevel):
     """ A QUIZ megjelenítő osztálya, amely egy felugró ablakban jelenik meg. """
@@ -118,7 +123,7 @@ class MakeQuiz(Toplevel):
 
     def make_the_widgets(self):
         "Létrehozza a Labeleket és a Radiobuttonokat a QUIZ-hez."
-        Label(self, text=self.quiz.random_word, fg="red").pack()
+        Label(self, text=self.quiz.random_word, fg="blue", font="Times 15 bold").pack()
         self.var = IntVar()
         i=2 #Azért, hogy a rossz megoldásokat ne együttesen pipálja be
         for answer in self.quiz.answers:
@@ -128,18 +133,21 @@ class MakeQuiz(Toplevel):
                 i+=1
                 button = Radiobutton(self, text=answer,variable=self.var, value=i)
             button.pack()
+
+        self.label = Label(self,text= "YOUR POINTS:", fg="green", font="Times 12 bold").pack()
+        self.points = Label(self,text=self.quiz.good, fg="green", font="Times 12 bold")
+        self.points.pack()
+
+        Button(self,text="NEXT", command=self.make_and_update).pack()
+        Button(self,text="RESET", command=self.Reset).pack()
+        Button(self, text= "EXIT THE QUIZ", command=self.exit).pack()
+    
     
     def make_game(self):
         "Kezdetben ez a függvény hozza létre a Quiz-t, majd a NEXT gombbal a make_and_update függvény hívódik meg."
-        self.master.withdraw() #eltűnteti a főablakot, amíg a QUIZ fut
         self.quiz.answers = []
         self.quiz.make_quiz()
         self.make_the_widgets()
-        self.label = Label(self,text= "YOUR POINTS:").pack()
-        self.points = Label(self,text=self.quiz.good).pack()
-
-        Button(self,text="NEXT", command=self.make_and_update).pack()
-        Button(self, text= "EXIT THE QUIZ", command=self.exit).pack()
 
     def make_and_update(self):
         "Az előző widgeteket törli, lecsekkolja, hogy jó-e az előző válasz, majd új QUIZ kérdést és válaszlehetőségeket ad. "
@@ -156,6 +164,10 @@ class MakeQuiz(Toplevel):
         messagebox.showinfo(title="EREDMÉNY",message="Az eredményed: "+ str(percentage) +"%")
         self.destroy()
         self.master.deiconify()
+
+    def Reset(self):
+        self.quiz.reset()
+        self.points.config(text=self.quiz.good)
 
     
 if __name__=="__main__":
