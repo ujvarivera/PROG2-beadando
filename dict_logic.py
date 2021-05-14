@@ -19,13 +19,19 @@ class Dictionary:
         """Visszaad egy random definíciót a már létező json fájlból."""
         return random.choice(list(self.data.values()))
 
+    def is_already_in_it(self,word):
+        """Visszaadja, hogy a beírt szó szerepel-e már a szótárban"""
+        for w in list(self.data.keys()):
+            if w == word:
+                return True
+        return False
+
     def add_word(self,word,definition):
         """Hozzáadja a megadott szót és definíciót a json fájlhoz. 
         Ha már létezik az a szó a szótárban, Exceptiont dob."""
-        for w in list(self.data.keys()):
-            if w == word:
-                raise Exception("A megadott szó már szerepel a szótárban!")
-                
+        if self.is_already_in_it(word):
+            raise Exception("A megadott szó már szerepel a szótárban!")
+
         new_word = {word:definition}
         self.data.update(new_word)
         with open(self.filename, "w") as f:
@@ -64,12 +70,17 @@ class Quiz:
         self.random_word = self.dictionary.get_random_word()
         self.the_good_answer = self.dictionary.data[self.random_word]
         self.answers.append(self.the_good_answer)
-        if len(self.dictionary.data) < 4: raise Exception("JSON must have at least 4 elements before starting QUIZ.")
+        if len(self.dictionary.data) < 4: raise Exception("Dict must have at least 4 elements before starting QUIZ.")
         while len(self.answers) != 4:
             new = self.dictionary.get_random_definition()
             if new not in self.answers:
                 self.answers.append(new)
         random.shuffle(self.answers)
+
+
+    def reset(self):
+        self.questions = 0
+        self.good = 0
 
 
 class Plot:
@@ -79,7 +90,7 @@ class Plot:
 
     def make_plot(self):
         plt.cla()
-        plt.title("Answers")
+        plt.title("Your answers")
         x = ["bad answers", "good answers", "number of questions"]
         y = [(self.quiz.questions-self.quiz.good), self.quiz.good, self.quiz.questions]
         plt.bar(x,y)
