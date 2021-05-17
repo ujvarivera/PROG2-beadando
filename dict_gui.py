@@ -10,13 +10,12 @@ class GUI(Tk):
         self.dictionary = dictionary
         self.title("My dictionary")
         self.configure(bg="#33cccc")
-        self.geometry("520x820")
+        self.geometry("420x720")
         self.widgets()
 
     def widgets(self):
         """Létrehozza a szükséges widgeteket."""
-        self.label2 = Label(self, text = "DICTIONARY ", font="Times 18 bold", bg="#33cccc")
-        self.label2.grid(row = 1, column = 0, sticky = W, padx = 5)
+        Label(self, text = "DICTIONARY ", font="Times 18 bold", bg="#33cccc").grid(row = 1, column = 0, sticky = W, padx = 5)
 
         self.var = StringVar()
         self.var.set("Please enter a word")
@@ -24,37 +23,33 @@ class GUI(Tk):
         self.text_entry.grid(row = 2, column = 0, sticky = W, pady=10, padx = 10)
         self.text_entry.bind("<Button-1>", self.reset)
 
-        self.random_button = Button(self, text="RANDOM",width = 10, command = self.get_random)
-        self.random_button.grid(row=3,column=0,sticky=W, padx = 10, pady=10)
+        Button(self, text="RANDOM",width = 10, command = self.get_random).grid(row=3,column=0,sticky=W, padx = 10, pady=10)
 
-        self.button1 = Button(self, text= "SEARCH", width = 10, command = self.search)
-        self.button1.grid(row=4, column = 0, sticky = W, padx = 10)
+        Button(self, text= "SEARCH", width = 10, command = self.search).grid(row=4, column = 0, sticky = W, padx = 10)
         self.bind('<Return>', self.search)
 
-        self.label3 = Label(self, text ="\nDefinition: ", font="Times 18 bold", bg="#33cccc")
-        self.label3.grid(row= 5, column=0, sticky = W)
+        Label(self, text ="\nDefinition: ", font="Times 18 bold", bg="#33cccc").grid(row= 5, column=0, sticky = W)
 
         self.output = Text(self, width=25, height=6, wrap=WORD, font="Times 15 bold")
         self.output.grid(row=6, column=0, sticky = W, pady=20, padx = 10)
 
         Label(self, text ="You can add new words here", bg="#33cccc", font="Times 15 bold").grid(row = 7, column =0, sticky = W, padx = 10, pady=10)
         Label(self, text ="Word: ", bg="#33cccc", font="Times 15 bold").grid(row = 8, column =0, sticky = W, padx = 10)
+
         self.text1 = Text(self, width = 30, height=1)
         self.text1.grid(row = 9, column =0, sticky = W, padx = 10, pady=10)
+
         Label(self, text ="Definition: ", bg="#33cccc", font="Times 15 bold").grid(row = 10, column =0, sticky = W, padx = 10)
         self.text2 = Text(self, width = 30, height =6)
         self.text2.grid(row = 11, column= 0, sticky = W, padx = 10, pady=10)
 
-        add_button = Button(self, text="ADD", command = self.add_new)
-        add_button.grid(row = 12, column =0, sticky = W, padx = 10)
+        Button(self, text="ADD", command = self.add_new).grid(row = 12, column =0, sticky = W, padx = 10)
 
         Button(self, text="LET'S TAKE A QUIZ!",command=self.play,fg="#1a1aff").grid(row=3, column=1, sticky = W, pady=5, padx = 10)
 
-        self.stat_button = Button(self, text="SHOW MY STAT",command=self.stat)
-        self.stat_button.grid(row=4, column=1, sticky = W, pady=5, padx = 10)
+        Button(self, text="SHOW MY STAT",command=self.stat).grid(row=4, column=1, sticky = W, pady=5, padx = 10)
 
-        self.exit_button = Button(self, text="EXIT", width = 10, command = self.exit)
-        self.exit_button.grid(row=12,column=1,sticky=W, padx = 10, pady = 5)
+        Button(self, text="EXIT", width = 10, command = self.exit).grid(row=12,column=1,sticky=W, padx = 10, pady = 5)
 
     def search(self,*args):
         """Megkeresi a beírt szóhoz tartozó jelentést, és a SEARCH gomb megnyomása, vagy az enter billentyű lenyomása
