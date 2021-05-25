@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 
 class Dictionary:
     """A szótár logikai osztálya."""
-    def __init__(self, filename):
+    def __init__(self, filename) -> None:
         self.filename = filename
         if os.path.exists(filename):
             with open(filename,"r") as f:
                 self.data = json.load(f)
 
-    def get_random_word(self):
+    def get_random_word(self): 
         """Visszaad egy random szót a már létező json fájlból."""
         return random.choice(list(self.data.keys()))
 
@@ -19,21 +19,18 @@ class Dictionary:
         """Visszaad egy random definíciót a már létező json fájlból."""
         return random.choice(list(self.data.values()))
 
-    def is_already_in_it(self,word:str):
+    def has_word(self,word:str)->bool:
         """Visszaadja, hogy a beírt szó szerepel-e már a szótárban"""
-        for w in list(self.data.keys()):
-            if w == word:
-                return True
-        return False
+        return word in self.data.keys()
 
-    def is_empty(self, text:str):
+    def is_empty(self, text:str)-> bool: 
         """Visszaadja, hogy írtunk-e a mezőbe szöveget, vagy sem."""
         return len(text) == 0
 
-    def add_word(self,word:str,definition:str):
+    def add_word(self,word:str,definition:str)-> None:
         """Hozzáadja a megadott szót és definíciót a json fájlhoz. 
         Ha már létezik az a szó a szótárban, Exceptiont dob."""
-        if self.is_already_in_it(word):
+        if self.has_word(word):
             raise Exception("A megadott szó már szerepel a szótárban!")
 
         if self.is_empty(word) or self.is_empty(definition):
@@ -47,7 +44,7 @@ class Dictionary:
 
 class Quiz:
     """A QUIZ logikai osztálya."""
-    def __init__(self, dictionary:Dictionary):
+    def __init__(self, dictionary:Dictionary)-> None:
         self.dictionary = dictionary
         self.random_word = None #random kiválasztott szó
         self.the_good_answer = None # a random szó tényleges jelentése
@@ -55,7 +52,7 @@ class Quiz:
         self.good = 0 # jó válaszaid számát tárolja, azaz a pontjaid
         self.questions = 0 # feltett kérdések számát tárolja
 
-    def shuffle_elements(self):
+    def shuffle_elements(self)-> None:
         """Megkeveri a json elemeit"""
         data_list = list(self.dictionary.data.items())
         random.shuffle(data_list)
@@ -69,7 +66,7 @@ class Quiz:
             return int((self.good/self.questions)*100)
         except ZeroDivisionError: pass
 
-    def make_quiz(self):
+    def make_quiz(self)-> None:
         """Megkeveri a JSON elemeit, kiválaszt egy random szót, és 4 válaszlehetőséget, melyek közül csak az egyik igaz.
         Majd ezeket is megkeveri, hogy random sorrendben jelenjenek meg. Ha a json fájl nem tartalmaz legalább 
         4 szót, kapunk egy Exceptiont, mivel ismétlődéseket nem szeretnénk látni."""
@@ -85,7 +82,7 @@ class Quiz:
         random.shuffle(self.answers)
 
 
-    def reset(self):
+    def reset(self)-> None:
         """Visszaállítja a pontszámot nullára, és a kérdések számlálója is újra indul."""
         self.questions = 0
         self.good = 0
@@ -93,10 +90,10 @@ class Quiz:
 
 class Plot:
     """A QUIZ-ben elért aktuális jó-rossz válaszok arányát mutatja meg."""
-    def __init__(self, quiz = Quiz):
+    def __init__(self, quiz = Quiz)-> None:
         self.quiz = quiz
 
-    def make_plot(self):
+    def make_plot(self)-> None:
         """Csinál egy plotot."""
         plt.cla()
         plt.title("Your answers")
