@@ -39,12 +39,13 @@ class Dictionary:
 class Quiz:
     """A QUIZ logikai osztálya."""
     def __init__(self, dictionary:Dictionary)-> None:
+        self.dictionary = dictionary
         self.random_word = None #random kiválasztott szó
         self.the_good_answer = None # a random szó tényleges jelentése
         self.answers = [] # 3 random definíciot tartalmaz, és a jó válaszhoz tartozót 
         self.good = 0 # jó válaszaid számát tárolja, azaz a pontjaid
         self.questions = 0 # feltett kérdések számát tárolja
-        self.dictionary = dictionary
+        self.asked_words = [] # azokat a szavakat tárolja amiket megkerdezett a quiz, plotolashoz
     
     def result(self):
         """Megmutatja az eredményed az EXIT gomb megnyomása után, hogy hány százalékot értél el."""
@@ -57,6 +58,7 @@ class Quiz:
         Ezeket megkeveri, hogy random sorrendben jelenjenek meg. Ha a json fájl nem tartalmaz legalább 
         4 szót, kapunk egy Exceptiont, mivel ismétlődéseket nem szeretnénk látni."""
         self.random_word = self.dictionary.get_random_word()
+        self.asked_words.append(self.random_word)
         self.the_good_answer = self.dictionary.data[self.random_word]
         self.answers.append(self.the_good_answer)
         if len(self.dictionary.data) < 4: raise Exception("Dict must have at least 4 elements before starting QUIZ.")
@@ -78,8 +80,10 @@ class Plot:
     def __init__(self, quiz = Quiz)-> None:
         self.quiz = quiz
 
-    def make_plot(self)-> None:
+    def make_plot(self,list_of_words:list)-> None:
         """Csinál egy plotot."""
+        
+        """
         x = ["bad answers", "good answers", "number of questions"]
         y = [(self.quiz.questions-self.quiz.good), self.quiz.good, self.quiz.questions]
 
@@ -87,7 +91,17 @@ class Plot:
         ax.bar(x, y)
         ax.set_title('Your answers')
         fig.show()
+        """
 
+        counts = dict()
+        for word in list_of_words:
+            counts[word] = counts.get(word, 0) + 1
+        k = counts.keys()
+        v = counts.values()
+        fig, ax = plt.subplots()
+        ax.bar(k,v)
+        ax.set_title("Megmutatja, hogy egy szó hányszor fordult elő egy körben.")
+        fig.show()
 
 if __name__=="__main__":
     dictionary = Dictionary("dictionary_of_words.json")
