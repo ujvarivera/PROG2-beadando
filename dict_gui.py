@@ -16,12 +16,12 @@ class GUI(Tk):
         """Létrehozza a szükséges widgeteket."""
         Label(self, text = "DICTIONARY ", font="Times 18 bold", bg="#33cccc").grid(row = 1, column = 0, sticky = W, padx = 5)
 
-        self.var = StringVar()
-        self.var.set("Please enter a word")
-        self.text_entry = Combobox(self, textvariable=self.var,width = 25, font="Times 15 bold")
-        self.text_entry.grid(row = 2, column = 0, sticky = W, pady=10, padx = 10)
-        self.text_entry.bind("<Button-1>", self.reset)
-        self.text_entry['values'] = [word for word in self.dictionary.data.keys()]
+        self.entryvar = StringVar()
+        self.entryvar.set("Please enter a word")
+        text_entry = Combobox(self, textvariable=self.entryvar,width = 25, font="Times 15 bold")
+        text_entry.grid(row = 2, column = 0, sticky = W, pady=10, padx = 10)
+        text_entry.bind("<Button-1>", self.reset)
+        text_entry['values'] = [word for word in self.dictionary.data.keys()]
 
         Button(self, text="RANDOM WORD",width = 20, command = self.get_random).grid(row=3,column=0,sticky=W, padx = 10, pady=10)
 
@@ -32,13 +32,13 @@ class GUI(Tk):
 
         self.output = scrolledtext.ScrolledText(self, width=25, height=6, wrap=WORD, font="Times 15 bold")
         self.output.grid(row=6, column=0, sticky = W, pady=20, padx = 10)
-        self.output.config(state=DISABLED)
+        self.output.config(state=DISABLED) #hogy ne lehessen beleírni
 
         Button(self, text="ADD NEW WORDS / UPDATE DEFINITIONS",width = 35, command = self.NewWords).grid(row = 12, column =0, sticky = W, padx = 10)
 
         Button(self, text="LET'S TAKE A QUIZ!",width = 15,fg="#1a1aff",command=self.play).grid(row=3, column=1, sticky = W, pady=5, padx = 10)
 
-        self.statbutton = Button(self, text="SHOW MY STAT",width = 15,command=self.stat)
+        self.statbutton = Button(self, text="PROBABILITY OF OCCURRENCE",width = 25,command=self.stat)
         self.statbutton.grid(row=4, column=1, sticky = W, pady=5, padx = 10)
         self.statbutton.config(state=DISABLED)
 
@@ -48,7 +48,7 @@ class GUI(Tk):
         """Megkeresi a beírt szóhoz tartozó jelentést, és a SEARCH gomb megnyomása, vagy az enter billentyű lenyomása
         után ki is írja azt. Ha nincs olyan szó, akkor kiírja, hogy Sorry."""
         self.output.config(state=NORMAL)
-        entered_text = self.text_entry.get()
+        entered_text = self.entryvar.get()
         self.output.delete(0.0, END)
         try:
             definition = self.dictionary.data[entered_text]
@@ -67,15 +67,14 @@ class GUI(Tk):
     
     def get_random(self):
         """A szótár létező szavai közül kiválaszt random egyet, amelyet beilleszt az Entry-be."""
-        self.text_entry.delete(0, 'end')
+        self.entryvar.set('')
         Random = self.dictionary.get_random_word()
-        self.text_entry.insert(0, Random)
+        self.entryvar.set(Random)
         self.search()
 
     def reset(self,*args):
         """A Entry tartalmát törli, a bal egérkattintáshoz van bind-olva."""
-        self.text_entry.delete(0, END)
-
+        self.entryvar.set('')
 
     def play(self):
         """A LET'S PLAY gombhoz van hozzárendelve, felugró ablakban megjeleníti a QUIZ-t"""
@@ -89,7 +88,7 @@ class GUI(Tk):
         Ha nem játszottunk még a QUIZ-zel, akkor nem jelenik meg semmi. """
         try:
             plot1 = Plot(self.quiz1)
-            plot1.make_plot()
+            plot1.make_plot(self.quiz1.asked_words)
         except:pass
 
     def NewWords(self):
@@ -107,36 +106,36 @@ class MakeQuiz(Toplevel):
         
     def check_answer(self):
         """Megnézi, hogy a kijelölt Radiobutton a jó válasz-e, ha igen növeli a pontszámot 1-gyel."""
-        if self.var.get() == 1: 
+        if self.radiobutton_var.get() == 1: 
             self.quiz.good += 1
 
-    def make_the_widgets(self):
+    def __make_the_widgets(self):
         "Létrehozza a Labeleket és a Radiobuttonokat a QUIZ-hez."
         Label(self, text=self.quiz.random_word, fg="blue", font="Times 15 bold").pack()
-        self.var = IntVar()
+        self.radiobutton_var = IntVar()
         i=2 #Azért, hogy a rossz megoldásokat ne együttesen pipálja be
         for answer in self.quiz.answers:
             if answer == self.quiz.the_good_answer:
-                button = Radiobutton(self, text=answer,variable=self.var, value=1)
+                button = Radiobutton(self, text=answer,variable=self.radiobutton_var, value=1)
             else: 
                 i+=1
-                button = Radiobutton(self, text=answer,variable=self.var, value=i)
+                button = Radiobutton(self, text=answer,variable=self.radiobutton_var, value=i)
             button.pack()
 
-        self.label = Label(self,text= "YOUR POINTS:", fg="green", font="Times 12 bold").pack()
-        self.points = Label(self,text=self.quiz.good, fg="green", font="Times 12 bold")
-        self.points.pack()
-
+        self.points_var = IntVar()
+        self.points_var.set(self.quiz.good)
+        Label(self,text= "YOUR POINTS:", fg="green", font="Times 12 bold").pack()
+        points_label = Label(self,textvariable=self.points_var, fg="green", font="Times 12 bold")
+        points_label.pack()
         Button(self,text="NEXT", command=self.make_and_update).pack()
         Button(self,text="RESET", command=self.Reset).pack()
         Button(self, text= "EXIT THE QUIZ", command=self.exit).pack()
-    
     
     def make_game(self):
         "Kezdetben ez a függvény hozza létre a Quiz-t, majd a NEXT gombbal a make_and_update függvény hívódik meg."
         self.quiz.answers = []
         self.quiz.make_quiz()
-        self.make_the_widgets()
+        self.__make_the_widgets()
 
     def make_and_update(self):
         "Az előző widgeteket törli, lecsekkolja, hogy jó-e az előző válasz, majd új QUIZ kérdést és válaszlehetőségeket ad. "
@@ -157,7 +156,7 @@ class MakeQuiz(Toplevel):
 
     def Reset(self):
         self.quiz.reset()
-        self.points.config(text=self.quiz.good)
+        self.points_var.set(self.quiz.good)
 
     
 class AddWords(Toplevel):
@@ -207,8 +206,3 @@ class AddWords(Toplevel):
         else: raise Exception("Hasznald a ADD gombot uj szo hozzaadasahoz!")
         self.text1.set('')
         self.text2.delete('1.0', 'end')
-
-if __name__=="__main__":
-    dictionary = Dictionary("dictionary_of_words.json")
-    view = GUI(dictionary)
-    view.mainloop()
