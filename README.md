@@ -19,6 +19,8 @@ Egy véletlenszerűen kiválasztott szóra is rákereshetünk a ``` RANDOM ``` s
 Ha olyan szóra keresünk rá, ami nem található meg a szótárban, azt a program jelzi.
 A szótárban nem csak rákeresni lehet szavakra, hanem hozzáadni új szó-definíció párost is
 az ``` ADD ``` gomb lenyomásával. Ha a beírt szó már létezik a szótárban, Exceptiont kapunk.
+Létezik egy ``` UPDATE ``` gomb is, amivel egy már létező szó definícióját tudjuk átírni,
+de új szót ez a gomb nem enged hozzáadni a szótárhoz. 
 
 
 
@@ -37,10 +39,9 @@ az eredményünk, illetve ekkor a kérdések számlálója is újra indul.
 
 
 # Plot
-A szótárnak van egy olyan opciója, hogy ``` SHOW MY STAT ```, ami megmutatja a QUIZ befejezése után
-az aktuális eredményünk a matplotlib.pyplot segítségével, azaz hogy hány jó, hány rossz válaszunk volt, 
-illetve az összes kilépésig feltett kérdés számát. Ha a QUIZ kitöltés előtt szeretnénk rányomni,
-akkor nem fog semmit sem csinálni.
+A szótárnak van egy olyan gombja, hogy ``` PROBABILITY OF OCCURRENCE ```, ami megmutatja a QUIZ befejezése után,
+hogy egyes szavak hányszor lettek megkérdezve egy kör alatt.
+Ha a QUIZ kitöltés előtt szeretnénk rányomni, akkor nem fogunk tudni rákattintani. 
 
 
 
