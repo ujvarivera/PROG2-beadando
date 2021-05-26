@@ -34,7 +34,7 @@ class GUI(Tk):
         self.output.grid(row=6, column=0, sticky = W, pady=20, padx = 10)
         self.output.config(state=DISABLED)
 
-        Button(self, text="ADD NEW WORDS",width = 20, command = self.NewWords).grid(row = 12, column =0, sticky = W, padx = 10)
+        Button(self, text="ADD NEW WORDS / UPDATE DEFINITIONS",width = 35, command = self.NewWords).grid(row = 12, column =0, sticky = W, padx = 10)
 
         Button(self, text="LET'S TAKE A QUIZ!",width = 15,fg="#1a1aff",command=self.play).grid(row=3, column=1, sticky = W, pady=5, padx = 10)
 
@@ -53,6 +53,8 @@ class GUI(Tk):
         try:
             definition = self.dictionary.data[entered_text]
         except:
+            if entered_text not in self.dictionary.not_existing_words:
+                self.dictionary.not_existing_words.append(entered_text)
             definition = "Sorry, there is no word like that."
 
         self.output.insert(END, definition)
@@ -60,6 +62,7 @@ class GUI(Tk):
 
     def exit(self):
         """Ezzel zárhatjuk be a programot, az EXIT gombhoz van hozzárendelve"""
+        self.dictionary.save_words()
         self.destroy()
     
     def get_random(self):
@@ -147,7 +150,7 @@ class MakeQuiz(Toplevel):
         """Az EXIT gombhoz van hozzárendelve, ezzel léphetünk ki a QUIZ-ből. Előtte megmutatja egy messageboxban,
         hány százalékot értél el. Valamint újra megnyitja a főablakot."""
         percentage = self.quiz.result()
-        messagebox.showinfo(title="EREDMÉNY",message="Az eredményed: "+ str(percentage) +"%")
+        messagebox.showinfo(title="RESULT",message="Az eredményed: "+ str(percentage) +"%")
         self.master.statbutton.config(state=NORMAL)
         self.destroy()
         self.master.deiconify()
@@ -168,28 +171,42 @@ class AddWords(Toplevel):
         self.__add_word_widgets()
 
     def __add_word_widgets(self):
-        Label(self, text ="YOU CAN ADD NEW WORDS HERE.", bg="#33cccc", font="Times 15 bold").grid(row = 7, column =0, sticky = W, padx = 10, pady=10)
-        Label(self, text ="Word: ", bg="#33cccc", font="Times 15 bold").grid(row = 8, column =0, sticky = W, padx = 10)
+        Label(self, text ="YOU CAN ADD NEW WORDS HERE.", bg="#33cccc", font="Times 15 bold").grid(row = 1, column =0, sticky = W, padx = 10, pady=10)
+        Label(self, text ="Word: ", bg="#33cccc", font="Times 15 bold").grid(row = 2, column =0, sticky = W, padx = 10)
 
-        self.text1 = Text(self, width = 30, height=1)
-        self.text1.grid(row = 9, column =0, sticky = W, padx = 10, pady=10)
+        self.text1 = Combobox(self, width = 30, height=1)
+        self.text1.grid(row = 3, column =0, sticky = W, padx = 10, pady=10)
+        self.text1['values'] = [word for word in self.dictionary.not_existing_words]
 
-        Label(self, text ="Definition: ", bg="#33cccc", font="Times 15 bold").grid(row = 10, column =0, sticky = W, padx = 10)
+        Label(self, text ="Definition: ", bg="#33cccc", font="Times 15 bold").grid(row = 4, column =0, sticky = W, padx = 10)
         self.text2 = Text(self, width = 30, height =6)
-        self.text2.grid(row = 11, column= 0, sticky = W, padx = 10, pady=10)
+        self.text2.grid(row = 5, column= 0, sticky = W, padx = 10, pady=10)
 
-        Button(self, text="ADD", width = 33,command = self.add_new).grid(row = 12, column =0, sticky = W, padx = 10,  pady=10)
+        Button(self, text="ADD WORD", width = 33,command = self.add_new).grid(row = 6, column =0, sticky = W, padx = 10,  pady=10)
+        Button(self, text="UPDATE DEFINITION", width = 33,command = self.update).grid(row = 7, column =0, sticky = W, padx = 10,  pady=10)
 
     def add_new(self):
         """Kiolvassa a két szövegmezőbe beírt szót és definíciót, majd az ADD gomb megnyomása után
         hozzáadja a már létező json fájlhoz, így ezután ez a kérdés is megjelenhet a QUIZ-ben."""
-        get_text1 = self.text1.get("1.0","end-1c")
+        get_text1 = self.text1.get()
         get_text2 = self.text2.get("1.0","end-1c")
         self.dictionary.add_word(get_text1,get_text2)
-        self.text1.delete('1.0', 'end')
+        self.text1.set('')
         self.text2.delete('1.0', 'end')
 
+        for word in self.dictionary.not_existing_words:
+            if word in self.dictionary.data.keys():
+                self.dictionary.not_existing_words.remove(word)
+        self.text1['values'] = [word for word in self.dictionary.not_existing_words]
 
+    def update(self):
+        get_text1 = self.text1.get()
+        get_text2 = self.text2.get("1.0","end-1c")
+        if get_text1 in self.dictionary.data.keys():
+            self.dictionary.data[get_text1] = get_text2
+        else: raise Exception("Hasznald a ADD gombot uj szo hozzaadasahoz!")
+        self.text1.set('')
+        self.text2.delete('1.0', 'end')
 
 if __name__=="__main__":
     dictionary = Dictionary("dictionary_of_words.json")
