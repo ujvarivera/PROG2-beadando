@@ -8,6 +8,7 @@ class Dictionary:
     def __init__(self, filename) -> None:
         self.filename = filename
         self.not_existing_words = [] #Azoknak a szavaknak a listája, amelyeket nem tartalmaz a szotar, de megprobaltad
+        self.word_exist = False 
         if os.path.exists(filename):
             with open(filename,"r") as f:
                 self.data = json.load(f)
