@@ -34,8 +34,11 @@ class GUI(Tk):
         self.output.grid(row=6, column=0, sticky = W, pady=20, padx = 10)
         self.output.config(state=DISABLED) #hogy ne lehessen beleírni
 
-        Button(self, text="ADD NEW WORDS / UPDATE DEFINITIONS",width = 35, command = self.NewWords).grid(row = 12, column =0, sticky = W, padx = 10)
-
+        self.add_update_var = StringVar()
+        self.add_update_var.set('')
+        self.add_update_button = Button(self, textvariable=self.add_update_var,width = 35, command = self.NewWords)
+        self.add_update_button.grid(row = 12, column =0, sticky = W, padx = 10)
+        self.add_update_button.config(state=DISABLED)
         Button(self, text="LET'S TAKE A QUIZ!",width = 15,fg="#1a1aff",command=self.play).grid(row=3, column=1, sticky = W, pady=5, padx = 10)
 
         self.statbutton = Button(self, text="PROBABILITY OF OCCURRENCE",width = 25,command=self.stat)
@@ -52,13 +55,21 @@ class GUI(Tk):
         self.output.delete(0.0, END)
         try:
             definition = self.dictionary.data[entered_text]
+            self.dictionary.word_exist= True
         except:
             if entered_text not in self.dictionary.not_existing_words:
                 self.dictionary.not_existing_words.append(entered_text)
             definition = "Sorry, there is no word like that."
+            self.dictionary.word_exist= False
 
         self.output.insert(END, definition)
         self.output.config(state=DISABLED)
+
+        self.add_update_button.config(state=NORMAL)
+        if self.dictionary.word_exist == False:
+            self.add_update_var.set("ADD")
+        else: self.add_update_var.set("UPDATE")
+
 
     def exit(self):
         """Ezzel zárhatjuk be a programot, az EXIT gombhoz van hozzárendelve"""
@@ -165,24 +176,29 @@ class AddWords(Toplevel):
         super().__init__(master)
         self.master = master
         self.dictionary = dictionary
-        self.title("Adding words")
         self.configure(bg="#33cccc")
         self.__add_word_widgets()
 
     def __add_word_widgets(self):
-        Label(self, text ="YOU CAN ADD NEW WORDS HERE.", bg="#33cccc", font="Times 15 bold").grid(row = 1, column =0, sticky = W, padx = 10, pady=10)
         Label(self, text ="Word: ", bg="#33cccc", font="Times 15 bold").grid(row = 2, column =0, sticky = W, padx = 10)
 
-        self.text1 = Combobox(self, width = 30, height=1)
+        self.text1 = Combobox(self, width = 30, height=1,textvariable=self.master.entryvar)
         self.text1.grid(row = 3, column =0, sticky = W, padx = 10, pady=10)
-        self.text1['values'] = [word for word in self.dictionary.not_existing_words]
+        if self.master.dictionary.word_exist == False:
+            self.text1['values'] = [word for word in self.dictionary.not_existing_words]
+        else: self.text1['values'] = [word for word in self.dictionary.data.keys()]
 
         Label(self, text ="Definition: ", bg="#33cccc", font="Times 15 bold").grid(row = 4, column =0, sticky = W, padx = 10)
-        self.text2 = Text(self, width = 30, height =6)
+        self.text2 = Text(self, width = 30, height =6, wrap=WORD)
         self.text2.grid(row = 5, column= 0, sticky = W, padx = 10, pady=10)
 
-        Button(self, text="ADD WORD", width = 33,command = self.add_new).grid(row = 6, column =0, sticky = W, padx = 10,  pady=10)
-        Button(self, text="UPDATE DEFINITION", width = 33,command = self.update).grid(row = 7, column =0, sticky = W, padx = 10,  pady=10)
+        if self.master.dictionary.word_exist == False:
+            Button(self, text="ADD WORD", width = 33,command = self.add_new).grid(row = 6, column =0, sticky = W, padx = 10,  pady=10)
+        else:
+            Button(self, text="UPDATE DEFINITION", width = 33,command = self.update).grid(row = 7, column =0, sticky = W, padx = 10,  pady=10)
+            self.text2.insert(END, self.dictionary.data[self.master.entryvar.get()])
+
+        self.bind('<Return>', self.search_def)
 
     def add_new(self):
         """Kiolvassa a két szövegmezőbe beírt szót és definíciót, majd az ADD gomb megnyomása után
@@ -206,3 +222,7 @@ class AddWords(Toplevel):
         else: raise Exception("Hasznald a ADD gombot uj szo hozzaadasahoz!")
         self.text1.set('')
         self.text2.delete('1.0', 'end')
+
+    def search_def(self,*args):
+        self.text2.delete(0.0, END)
+        self.text2.insert(END, self.dictionary.data[self.master.entryvar.get()])
