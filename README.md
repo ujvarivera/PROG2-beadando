@@ -18,8 +18,9 @@ Egy szó beírása után a ``` SEARCH ```gombbal kereshetünk rá annak jelenté
 Egy véletlenszerűen kiválasztott szóra is rákereshetünk a ``` RANDOM ``` segítségével. 
 Ha olyan szóra keresünk rá, ami nem található meg a szótárban, azt a program jelzi.
 A szótárban nem csak rákeresni lehet szavakra, hanem hozzáadni új szó-definíció párost is
-az ``` ADD ``` gomb lenyomásával. Ha a beírt szó már létezik a szótárban, Exceptiont kapunk.
-Létezik egy ``` UPDATE ``` gomb is, amivel egy már létező szó definícióját tudjuk átírni,
+az ``` ADD ``` gomb lenyomásával. Ha a beírt szó már létezik a szótárban, Exceptiont kapunk,
+amit a programunkban is olvashatunk, nem csak a konzolon.
+Létezik egy ``` UPDATE DEFINITION``` gomb is, amivel egy már létező szó definícióját tudjuk átírni,
 de új szót ez a gomb nem enged hozzáadni a szótárhoz. 
 
 
