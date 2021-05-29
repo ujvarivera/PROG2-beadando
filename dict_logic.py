@@ -82,19 +82,8 @@ class Quiz:
         self.good = 0
         self.asked_words = []
 
-    def make_plot(self)-> None:
+    def make_plot(self,filename:str)-> None:
         """Csinál egy plotot."""
-        
-        """
-        x = ["bad answers", "good answers", "number of questions"]
-        y = [(self.quiz.questions-self.quiz.good), self.quiz.good, self.quiz.questions]
-
-        fig, ax = plt.subplots()
-        ax.bar(x, y)
-        ax.set_title('Your answers')
-        fig.show()
-        """
-
         counts = dict()
         for word in self.asked_words:
             counts[word] = counts.get(word, 0) + 1
@@ -103,7 +92,7 @@ class Quiz:
         fig, ax = plt.subplots()
         ax.bar(k,v)
         ax.set_title("Megmutatja, hogy egy szó hányszor fordult elő egy körben.")
-        fig.show()
+        fig.savefig(filename)
 
 
 if __name__=="__main__":
