@@ -99,7 +99,7 @@ class GUI(Tk):
         """Az aktuális statisztikát készíti el a matplotlib segítségével, a SHOW MY STAT gomb megnyomása után.
         Ha nem játszottunk még a QUIZ-zel, akkor nem jelenik meg semmi. """
         try:
-            self.quiz1.make_plot()
+            self.quiz1.make_plot("plot.jpg")
         except:pass
 
     def NewWords(self):
@@ -117,21 +117,15 @@ class MakeQuiz(Toplevel):
         
     def check_answer(self):
         """Megnézi, hogy a kijelölt Radiobutton a jó válasz-e, ha igen növeli a pontszámot 1-gyel."""
-        if self.radiobutton_var.get() == 1: 
+        if self.radiobutton_var.get() == self.quiz.the_good_answer:
             self.quiz.good += 1
 
     def __make_the_widgets(self):
         "Létrehozza a Labeleket és a Radiobuttonokat a QUIZ-hez."
         Label(self, text=self.quiz.random_word, fg="blue", font="Times 15 bold").pack()
-        self.radiobutton_var = IntVar()
-        i=2 #Azért, hogy a rossz megoldásokat ne együttesen pipálja be
+        self.radiobutton_var = StringVar()
         for answer in self.quiz.answers:
-            if answer == self.quiz.the_good_answer:
-                button = Radiobutton(self, text=answer,variable=self.radiobutton_var, value=1)
-            else: 
-                i+=1
-                button = Radiobutton(self, text=answer,variable=self.radiobutton_var, value=i)
-            button.pack()
+            Radiobutton(self, text=answer,variable=self.radiobutton_var, value=answer).pack()
 
         self.points_var = IntVar()
         self.points_var.set(self.quiz.good)
@@ -200,14 +194,23 @@ class AddWords(Toplevel):
             Button(self, text="UPDATE DEFINITION", width = 33,command = self.update).grid(row = 7, column =0, sticky = W, padx = 10,  pady=10)
             self.text2.insert(END, self.dictionary.data[self.master.entryvar.get()])
 
+        self.add_var=StringVar()
+        Label(self, textvariable=self.add_var, bg="#33cccc").grid(row=8,column=0) #hogy sikeres volt-e a hozzadas  vagy sem
+
         self.bind('<Return>', self.search_def)
 
     def add_new(self):
         """Kiolvassa a két szövegmezőbe beírt szót és definíciót, majd az ADD gomb megnyomása után
         hozzáadja a már létező json fájlhoz, így ezután ez a kérdés is megjelenhet a QUIZ-ben."""
+
         get_text1 = self.text1.get()
         get_text2 = self.text2.get("1.0","end-1c")
-        self.dictionary.add_word(get_text1,get_text2)
+        try:
+            self.dictionary.add_word(get_text1,get_text2)
+            self.add_var.set("Sikeres hozzaadas")
+        except Exception as e:
+            self.add_var.set(e)
+            
         self.text1.set('')
         self.text2.delete('1.0', 'end')
 
@@ -216,11 +219,16 @@ class AddWords(Toplevel):
                 self.dictionary.not_existing_words.remove(word)
         self.text1['values'] = [word for word in self.dictionary.not_existing_words]
 
+
     def update(self):
         get_text1 = self.text1.get()
         get_text2 = self.text2.get("1.0","end-1c")
 
-        self.master.dictionary.update_word(get_text1,get_text2)
+        try:
+            self.master.dictionary.update_word(get_text1,get_text2)
+            self.add_var.set("Sikeres Update")
+        except Exception as e:
+            self.add_var.set(e)
 
         self.text1.set('')
         self.text2.delete('1.0', 'end')
