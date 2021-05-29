@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.ttk import Combobox, Radiobutton
 from tkinter import messagebox, scrolledtext
-from dict_logic import Dictionary, Quiz, Plot
+from dict_logic import Dictionary, Quiz
 
 class GUI(Tk):
     """ A szótár megjelenítéséért felelős osztály."""
@@ -22,6 +22,7 @@ class GUI(Tk):
         text_entry.grid(row = 2, column = 0, sticky = W, pady=10, padx = 10)
         text_entry.bind("<Button-1>", self.reset)
         text_entry['values'] = [word for word in self.dictionary.data.keys()]
+        text_entry.bind('<<ComboboxSelected>>', self.search)
 
         Button(self, text="RANDOM WORD",width = 20, command = self.get_random).grid(row=3,column=0,sticky=W, padx = 10, pady=10)
 
@@ -98,8 +99,7 @@ class GUI(Tk):
         """Az aktuális statisztikát készíti el a matplotlib segítségével, a SHOW MY STAT gomb megnyomása után.
         Ha nem játszottunk még a QUIZ-zel, akkor nem jelenik meg semmi. """
         try:
-            plot1 = Plot(self.quiz1)
-            plot1.make_plot(self.quiz1.asked_words)
+            self.quiz1.make_plot()
         except:pass
 
     def NewWords(self):
@@ -186,7 +186,9 @@ class AddWords(Toplevel):
         self.text1.grid(row = 3, column =0, sticky = W, padx = 10, pady=10)
         if self.master.dictionary.word_exist == False:
             self.text1['values'] = [word for word in self.dictionary.not_existing_words]
-        else: self.text1['values'] = [word for word in self.dictionary.data.keys()]
+        else: 
+            self.text1['values'] = [word for word in self.dictionary.data.keys()]
+            self.text1.bind('<<ComboboxSelected>>', self.search_def)
 
         Label(self, text ="Definition: ", bg="#33cccc", font="Times 15 bold").grid(row = 4, column =0, sticky = W, padx = 10)
         self.text2 = Text(self, width = 30, height =6, wrap=WORD)
@@ -217,9 +219,9 @@ class AddWords(Toplevel):
     def update(self):
         get_text1 = self.text1.get()
         get_text2 = self.text2.get("1.0","end-1c")
-        if get_text1 in self.dictionary.data.keys():
-            self.dictionary.data[get_text1] = get_text2
-        else: raise Exception("Hasznald a ADD gombot uj szo hozzaadasahoz!")
+
+        self.master.dictionary.update_word(get_text1,get_text2)
+
         self.text1.set('')
         self.text2.delete('1.0', 'end')
 
