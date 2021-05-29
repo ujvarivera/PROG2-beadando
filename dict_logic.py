@@ -32,6 +32,12 @@ class Dictionary:
 
         self.data[word] = definition
 
+    def update_word(self, word:str, new_def:str) -> None:
+        if word in self.data.keys():
+            self.data[word] = new_def
+
+        else: raise Exception("Csak meglevo szavak definiciojat tudod modositani")
+
     def save_words(self):
         with open(self.filename, "w") as f:
             f.write(json.dumps(self.data))     
@@ -74,14 +80,9 @@ class Quiz:
         """Visszaállítja a pontszámot nullára, és a kérdések számlálója is újra indul."""
         self.questions = 0
         self.good = 0
+        self.asked_words = []
 
-
-class Plot:
-    """A QUIZ-ben elért aktuális jó-rossz válaszok arányát mutatja meg."""
-    def __init__(self, quiz = Quiz)-> None:
-        self.quiz = quiz
-
-    def make_plot(self,list_of_words:list)-> None:
+    def make_plot(self)-> None:
         """Csinál egy plotot."""
         
         """
@@ -95,7 +96,7 @@ class Plot:
         """
 
         counts = dict()
-        for word in list_of_words:
+        for word in self.asked_words:
             counts[word] = counts.get(word, 0) + 1
         k = counts.keys()
         v = counts.values()
@@ -103,6 +104,7 @@ class Plot:
         ax.bar(k,v)
         ax.set_title("Megmutatja, hogy egy szó hányszor fordult elő egy körben.")
         fig.show()
+
 
 if __name__=="__main__":
     dictionary = Dictionary("dictionary_of_words.json")
